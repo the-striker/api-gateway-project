@@ -22,7 +22,8 @@ jobs:
           cd gateway
           ./mvnw clean package -DskipTests
           ls target/
-
+          
+      
       - name: Copy artifact to EC2
         uses: appleboy/scp-action@v0.1.2
         with:
