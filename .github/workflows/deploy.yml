@@ -21,6 +21,7 @@ jobs:
         run: |
           cd gateway
           ./mvnw clean package -DskipTests
+          ls target/
 
       - name: Copy artifact to EC2
         uses: appleboy/scp-action@v0.1.2
@@ -42,3 +43,4 @@ jobs:
           script: |
             pkill -f 'java -jar app.jar' || true
             nohup java -jar /home/ec2-user/app.jar > /home/ec2-user/app.log 2>&1 &
+            echo "Spring Boot app started"
