@@ -21,7 +21,7 @@ jobs:
         run: |
           cd gateway
           ./mvnw clean package -DskipTests
-          ls target/
+          mv target/*.jar target/app.jar
       
       
       - name: Add SSH key
@@ -40,4 +40,5 @@ jobs:
           ssh -i private_key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
             pkill -f 'java -jar app.jar' || true
             nohup java -jar /home/ec2-user/app.jar > /home/ec2-user/app.log 2>&1 &
+            tail -n 20 /home/ec2-user/app.log
           "
