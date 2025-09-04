@@ -36,9 +36,18 @@ jobs:
             ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/app.jar
 
       - name: Run Spring Boot on EC2
-        run: |
-          ssh -i private_key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
-            pkill -f 'java -jar app.jar' || true
-            nohup java -jar /home/ec2-user/app.jar > /home/ec2-user/app.log 2>&1 &
-            tail -n 20 /home/ec2-user/app.log
-          "
+  run: |
+    ssh -i private_key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "
+      if ! command -v java &> /dev/null
+      then
+        echo 'Java not found. Installing...'
+        sudo yum update -y
+        sudo amazon-linux-extras enable java-openjdk21
+        sudo yum install -y java-21-amazon-corretto
+      fi
+      pkill -f 'java -jar /home/ec2-user/app.jar' || true
+      nohup java -jar /home/ec2-user/app.jar > /home/ec2-user/app.log 2>&1 &
+      sleep 5
+      tail -n 20 /home/ec2-user/app.log
+    "
+
