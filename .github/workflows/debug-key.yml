@@ -1,0 +1,29 @@
+name: Debug EC2 Key
+
+on:
+  workflow_dispatch:   # allows manual trigger
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check secret exists
+        run: |
+          if [ -z "${{ secrets.EC2_KEY_B64 }}" ]; then
+            echo "❌ Secret is missing"
+            exit 1
+          else
+            echo "✅ Secret is set"
+          fi
+
+      - name: Decode and check key
+        run: |
+          echo "${{ secrets.EC2_KEY_B64 }}" | base64 -d > private_key.pem || {
+            echo "❌ Base64 decode failed"
+            exit 1
+          }
+          chmod 600 private_key.pem
+
+          # Show first and last line only (safe check)
+          head -n 2 private_key.pem
+          tail -n 2 private_key.pem
